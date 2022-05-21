@@ -8,10 +8,13 @@ The UI is a node application.  Here's an easy way to get going:
 2. Install node and nps - *brew install node*
 3. Install typescript
    - npm install -g typescript
+4. You will need to run the API service if the application is going to be functional: https://github.com/joddyjods/jobsearch-api
 
 # Running the application
-- npm start - note that it will run on port 3000 by default
+- **npm** start - note that it will run on port 3000 by default
+- **npm** test - runs the test runner
+- **npm** start - starts the development server
 
 # Things that are next to do
-- [ ] Create a starter React app - *npx create-react-app <projectname>*
+- [ ] Make the UI do something with the API service
 - [ ] Take a look at incorporating material UI - https://mui.com 
