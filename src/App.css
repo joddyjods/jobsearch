@@ -28,6 +28,51 @@
   color: #61dafb;
 }
 
+.Conversation {
+  font-size: calc(15px + svmin);
+  align-items: center;
+}
+
+.ConversationInner {
+  align-items: center;
+}
+
+.ConversationLineRight {
+  display: block;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ConversationLineLeft {
+  display: block;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.Message {
+  border : 1px solid blue;
+  background-color: lightskyblue;
+  width : 60%;
+  padding : 4px;
+  margin : 6px;
+}
+
+.AddOne {
+  min-width : 360px;
+  min-height: 90px;
+  border : 4px gray dashed;
+  align-items: center;
+  text-align: center;
+  color: gray;
+  font-size: calc(10px + 2vmin);
+  padding : 4px;
+  margin : 6px;
+  cursor: pointer;
+}
+
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
