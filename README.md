@@ -9,6 +9,7 @@ The UI is a node application.  Here's an easy way to get going:
 3. Install typescript
    - npm install -g typescript
 4. You will need to run the API service if the application is going to be functional: https://github.com/joddyjods/jobsearch-api
+4. Set up the material UI support - https://mui.com/material-ui/getting-started/installation/
 
 # Running the application
 - **npm** start - note that it will run on port 3000 by default

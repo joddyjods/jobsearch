@@ -1,6 +1,40 @@
 import logo from './logo.svg';
 import './App.css';
-import React from 'react';
+//import React from 'react';
+//import ReactDOM from 'react-dom';
+import Button from '@mui/material/Button';
+
+import * as React from 'react';
+import { styled, useTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import CssBaseline from '@mui/material/CssBaseline';
+import List from '@mui/material/List';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import MailIcon from '@mui/icons-material/Mail';
+import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
+import EmailIcon from '@mui/icons-material/EmailOutlined';
+import WebIcon from '@mui/icons-material/Web';
+import TextsmsIcon from '@mui/icons-material/Textsms';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import PhoneIcon from '@mui/icons-material/Phone';
+import VideoIcon from '@mui/icons-material/VideoCameraFront';
+
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
+
 
 class Conversation extends React.Component {
   constructor(props) {
@@ -12,9 +46,9 @@ class Conversation extends React.Component {
         }
       ],*/
       interactions: [
-        {from: 'you', date: 'May 4, 2022', msg: 'Applied at the website', key:'abc'},
-        {from: 'Charles English', date: 'May 5, 2022', msg: 'Responded with an email', key:'123'},
-        {from: 'you', date: 'May 6, 2022', msg: 'Provided times for an interview', key:'asdf'}
+        {source: 'website', from: 'you', date: 'May 4, 2022', msg: 'Applied at the website', key:'abc'},
+        {source: 'email', from: 'Charles English', date: 'May 5, 2022', msg: 'Responded with an email', key:'123'},
+        {source: 'message', from: 'you', date: 'May 6, 2022', msg: 'Provided times for an interview.  I told them that I didnt really care when the times were and gave them lots of times and then even more times, and then some other things happened', key:'asdf'}
       ]
     };
   }
@@ -29,7 +63,44 @@ class Conversation extends React.Component {
     this.setState( newstate );
   }
 
+  getIcon( source ) {
+    if ( source == 'website' ) {
+      return (
+        <WebIcon />
+      );
+    }
+    if ( source == 'email' ) {
+      return (
+        <EmailIcon />
+      );
+    }
+    if ( source == 'message' ) {
+      return (
+        <TextsmsIcon />
+      );
+    }
+
+    if ( source == 'linkedin' ) {
+      return (
+        <LinkedInIcon />
+      );
+    }
+    if ( source == 'phone' ) {
+      return (
+        <PhoneIcon />
+      );
+    }
+    if ( source == 'video' ) {
+      return (
+        <VideoIcon />
+      );
+    }
+
+    return ( <EmailIcon /> );
+  }
+
   render() {
+    
     const interactions = this.state.interactions;
     let i = 0;
 
@@ -39,8 +110,8 @@ class Conversation extends React.Component {
         theclass = 'ConversationLineLeft';
       }
       let key = 'ConversationLine' + i++;
-      return ( 
-        <div className={theclass} key={key}>
+
+      /*<div className={theclass} key={key}>
           <div className='Message' key={interaction.key}>
             {interaction.date} <br />
             {interaction.from} 
@@ -48,17 +119,51 @@ class Conversation extends React.Component {
               {interaction.msg}
             </p>
           </div>
-        </div> );
+        </div>*/
+
+      return ( 
+        <span>
+        <ListItem alignItems="flex-start">
+          <ListItemAvatar>
+            {this.getIcon(interaction.source)}
+          </ListItemAvatar>
+          <ListItemText
+            primary={interaction.from}
+            secondary={
+              <React.Fragment>
+                <Typography
+                  sx={{ display: 'inline' }}
+                  component="span"
+                  variant="body2"
+                  color="text.primary"
+                >
+                  {interaction.date}
+                </Typography>
+                 - {interaction.msg}
+              </React.Fragment>
+            }
+          />
+        </ListItem>
+        <Divider variant="inset" component="li" />
+        </span>
+        );
     });
 
-    return ( 
-      <div className="ConversationInner"> {output} 
-        <div className='AddOne' onClick={() =>this.dataEnterNewMessage()}><p>+ Add a thing</p></div>
-      </div>
-      );
-  }
 
-  
+  return (
+    <span>
+  <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+      {output}
+  </List>
+    <div className='AddOne'>
+      <Button variant="outlined" onClick={() =>this.dataEnterNewMessage()}>
+        + Add a thing
+      </Button>
+      
+    </div>
+    </span>
+  )
+  } 
 }
 
 class Interaction extends React.Component {
@@ -67,12 +172,146 @@ class Interaction extends React.Component {
   }
 }
 
-function App() {
+
+
+
+
+
+
+
+
+
+
+const drawerWidth = 700;
+
+const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    flexGrow: 1,
+    padding: theme.spacing(3),
+    transition: theme.transitions.create('margin', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen,
+    }),
+    marginRight: -drawerWidth,
+    ...(open && {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginRight: 0,
+    }),
+  }),
+);
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+  transition: theme.transitions.create(['margin', 'width'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    marginRight: drawerWidth,
+  }),
+}));
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(0, 1),
+  // necessary for content to be below app bar
+  ...theme.mixins.toolbar,
+  justifyContent: 'flex-start',
+}));
+
+export default function App() {
+  const theme = useTheme();
+  const [open, setOpen] = React.useState(false);
+
+  const handleDrawerOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setOpen(false);
+  };
+
   return (
-    <div className="Conversation">
-      <Conversation />
-    </div>
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <AppBar position="fixed" open={open}>
+        <Toolbar>
+          <Typography variant="h6" noWrap sx={{ flexGrow: 1 }} component="div">
+            Opportunities will go here
+          </Typography>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="end"
+            onClick={handleDrawerOpen}
+            sx={{ ...(open && { display: 'none' }) }}
+          >
+            <MessageOutlinedIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+      <Main open={open}>
+        <DrawerHeader />
+        <Typography paragraph>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Rhoncus dolor purus non
+          enim praesent elementum facilisis leo vel. Risus at ultrices mi tempus
+          imperdiet. Semper risus in hendrerit gravida rutrum quisque non tellus.
+          Convallis convallis tellus id interdum velit laoreet id donec ultrices.
+          Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
+          adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra
+          nibh cras. Metus vulputate eu scelerisque felis imperdiet proin fermentum
+          leo. Mauris commodo quis imperdiet massa tincidunt. Cras tincidunt lobortis
+          feugiat vivamus at augue. At augue eget arcu dictum varius duis at
+          consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
+          sapien faucibus et molestie ac.
+        </Typography>
+        <Typography paragraph>
+          Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper
+          eget nulla facilisi etiam dignissim diam. Pulvinar elementum integer enim
+          neque volutpat ac tincidunt. Ornare suspendisse sed nisi lacus sed viverra
+          tellus. Purus sit amet volutpat consequat mauris. Elementum eu facilisis
+          sed odio morbi. Euismod lacinia at quis risus sed vulputate odio. Morbi
+          tincidunt ornare massa eget egestas purus viverra accumsan in. In hendrerit
+          gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem
+          et tortor. Habitant morbi tristique senectus et. Adipiscing elit duis
+          tristique sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
+          eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
+          posuere sollicitudin aliquam ultrices sagittis orci a.
+        </Typography>
+      </Main>
+      <Drawer
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+          },
+        }}
+        variant="persistent"
+        anchor="right"
+        open={open}
+      >
+        <DrawerHeader>
+          <IconButton onClick={handleDrawerClose}>
+            {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          </IconButton>
+        </DrawerHeader>
+        <Divider />
+        <div className="Conversation">
+          <Conversation />
+        </div>
+      </Drawer>
+    </Box>
   );
 }
-
-export default App;
