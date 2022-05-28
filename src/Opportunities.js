@@ -1,4 +1,4 @@
-import './Conversation.css';
+import './Opportunities.css';
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Button from '@mui/material/Button';
@@ -13,28 +13,23 @@ import TextsmsIcon from '@mui/icons-material/Textsms';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import PhoneIcon from '@mui/icons-material/Phone';
 import VideoIcon from '@mui/icons-material/VideoCameraFront';
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
 
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 
 export default function render( props ) {
-    return ( <Conversation {...props}></Conversation> );
+    return ( <Opportunities  {...props}></Opportunities> );
 }
 
-class Conversation extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = props;
-    }
 
-    deleteMessage( id ) {
-        this.state.convoDeleteHandler(id);
-    }
+class Opportunities extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = props;
+      }
   
     dataEnterNewMessage() {
-        this.state.convoAddHandler( 'linkedin', 'you', 'May 9, 2022', 'Did some other things' );
+      this.addMessage( 'you', 'May 9, 2022', 'Did some other things','92fjdi' );
     }
   
     addMessage( who, when, msg, key ) {
@@ -78,24 +73,56 @@ class Conversation extends React.Component {
   
       return ( <EmailIcon /> );
     }
+
+    mapCompanies( companies ) {
+        const companyMap = {};
+
+        for ( var i = 0; i < companies.length; ++i ) {
+            companyMap[companies[i]['id']] = companies[i];
+        }
+
+        return companyMap;
+    }
   
+    enrichOpportunities( oppties, companies, people ) {
+        let o = [];
+
+        const companyMap = this.mapCompanies( companies );
+
+        for ( var i = 0; i < oppties.length; ++i ) {
+            // Spread/clone the opportunity
+            let oppty = { ... oppties[i] };
+
+            // Enrich it with the company name
+            oppty.company = companyMap[oppty.companyid];
+
+
+            // Enrich it with all associated contacts
+            
+
+            // Add it to the list you're returning
+            o.push( oppty );
+        }
+
+        return o;
+    }
+    
     render() {
       
-      const interactions = this.state.interactions;
+      const opportunities = this.enrichOpportunities( this.state.opportunities, this.state.companies, this.state.people );
       let i = 0;
   
-      let output = interactions.map(interaction => {
-        
-        let key = 'ConversationLine' + i++;
+      let output = opportunities.map(oppty => {
   
+        let key = 'Opptyline' + i++;
         return ( 
           <span>
           <ListItem alignItems="flex-start">
             <ListItemAvatar>
-              {this.getIcon(interaction.source)}
+              {this.getIcon(oppty.source)}
             </ListItemAvatar>
             <ListItemText
-              primary={interaction.from}
+              primary={oppty.jobtitle}
               secondary={
                 <React.Fragment>
                   <Typography
@@ -104,15 +131,11 @@ class Conversation extends React.Component {
                     variant="body2"
                     color="text.primary"
                   >
-                    {interaction.date}
+                    {oppty.company.name}
                   </Typography>
-                   - {interaction.msg}
                 </React.Fragment>
               }
             />
-            <IconButton edge="end" aria-label="delete">
-                <DeleteIcon onClick={() =>this.deleteMessage(interaction.id)}/>
-            </IconButton>
           </ListItem>
           <Divider variant="inset" component="li" />
           </span>

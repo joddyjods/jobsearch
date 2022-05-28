@@ -1,8 +1,4 @@
-import logo from './logo.svg';
 import './App.css';
-//import React from 'react';
-//import ReactDOM from 'react-dom';
-import Button from '@mui/material/Button';
 
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
@@ -18,11 +14,144 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import Conversation from './Conversation';
+import Opportunities from './Opportunities';
+
+/*
+
+The App has flat lists of companies, opportunities, people and conversations.  
+// TODO - it needs to get these from an API that will read/write them
+
+As changes occur, App will combine the flat lists to combine information that can be used for
+rendering different lists with rich information.  All of these are in its state.
+
+App also keeps a "scope" in its state that gives information to the child components on what items
+to render.  That scope can be defined in terms of companies, opportunities or people.  The scope
+is passed to child components so they know how to render and also can fill in information when 
+you add information.
+
+The children use callbacks to add items as well as to change the scope.
+
+*/
+// TODO - allow selection of opportunity and use it to scope conversations 
+// TODO - consider moving all of the maps up to the top-level app (or even the API) rather than building them in render functions
+
+/*
+import * as React from 'react';
+import Box from '@mui/material/Box';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider';
+import InboxIcon from '@mui/icons-material/Inbox';
+import DraftsIcon from '@mui/icons-material/Drafts';
+
+export default function SelectedListItem() {
+  const [selectedIndex, setSelectedIndex] = React.useState(1);
+
+  const handleListItemClick = (event, index) => {
+    setSelectedIndex(index);
+  };
+
+  return (
+    <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+      <List component="nav" aria-label="main mailbox folders">
+        <ListItemButton
+          selected={selectedIndex === 0}
+          onClick={(event) => handleListItemClick(event, 0)}
+        >
+          <ListItemIcon>
+            <InboxIcon />
+          </ListItemIcon>
+          <ListItemText primary="Inbox" />
+        </ListItemButton>
+        <ListItemButton
+          selected={selectedIndex === 1}
+          onClick={(event) => handleListItemClick(event, 1)}
+        >
+          <ListItemIcon>
+            <DraftsIcon />
+          </ListItemIcon>
+          <ListItemText primary="Drafts" />
+        </ListItemButton>
+      </List>
+      <Divider />
+      <List component="nav" aria-label="secondary mailbox folder">
+        <ListItemButton
+          selected={selectedIndex === 2}
+          onClick={(event) => handleListItemClick(event, 2)}
+        >
+          <ListItemText primary="Trash" />
+        </ListItemButton>
+        <ListItemButton
+          selected={selectedIndex === 3}
+          onClick={(event) => handleListItemClick(event, 3)}
+        >
+          <ListItemText primary="Spam" />
+        </ListItemButton>
+      </List>
+    </Box>
+  );
+}
 
 
+*/
 
 
 const drawerWidth = 700;
+
+const companies = [
+  {
+    id : 1,
+    name : 'Amazon'
+  },
+  {
+    id : 2,
+    name : 'Kava.io'
+  }
+];
+
+const opportunities = [
+  {
+    id : 1001,
+    companyid : 1,
+    jobtitle : 'Sr Software Development Manager, Go',
+    hiringmanager : 10001
+  },
+  {
+    id : 1002,
+    companyid : 1,
+    jobtitle : 'Sr Software Development Manager, Assets',
+    hiringmanager : -1
+  },
+  {
+    id : 1003,
+    companyid : 2,
+    jobtitle : 'Vice President, Engineering',
+    hiringmanager : 10002
+  }
+];
+
+const people = [
+  { 
+    id : 10001,
+    first : 'Charles',
+    last : 'Jansen',
+    title : 'Director, Amazon Go'
+  },
+  { 
+    id : 10002,
+    first : 'Jason',
+    last : 'Ward',
+    title : 'Senior Vice President, Engineering'
+  }
+];
+
+const interactions = [
+  {id: 1, source: 'website', from: 'you', date: 'May 4, 2022', msg: 'Applied at the website', key:'abc'},
+  {id: 2, source: 'email', from: 'Charles English', date: 'May 5, 2022', msg: 'Responded with an email', key:'123'},
+  {id: 3, source: 'message', from: 'you', date: 'May 6, 2022', msg: 'Provided times for an interview.  I told them that I didnt really care when the times were and gave them lots of times and then even more times, and then some other things happened', key:'asdf'}
+];
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
@@ -68,90 +197,136 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
   justifyContent: 'flex-start',
 }));
-
-export default function App() {
+  
+export default function Render(props) {
+  
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const setOpen = React.useState(false);
+  const open = React.useState(false);
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+  return ( <App {...props} theme={theme} open={open}/> )
+}
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+class App extends React.Component {
 
-  return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <AppBar position="fixed" open={open}>
-        <Toolbar>
-          <Typography variant="h6" noWrap sx={{ flexGrow: 1 }} component="div">
-            Opportunities will go here
+  convoDeleteHandler(id) {
+    let interactions = this.state.interactions;
+    for ( var i = interactions.length-1; i >= 0; --i ) {
+      if ( interactions[i].id == id ) {
+        interactions.splice( i, 1 );
+      }
+    }
+
+    this.setState( {interactions: interactions} );
+  }
+
+  convoAddHandler( source, from, date, msg ) {
+    let interactions = this.state.interactions;
+    interactions.push( {
+      id: 55, 
+      source: source,
+      from: from,
+      date: date,
+      msg: msg,
+      key: 'asldfkjalsdkfj'
+    });
+    this.setState( {interactions: interactions} );
+  }
+
+  /**
+   * Add or remove scoping for the items being shown
+   * @param {*} scopeType 'company', 'opportunity', or 'person' 
+   * @param {*} newValue The ID of the object to scope down to, or null for unscoped
+   */
+  scopeChange( scopeType, newValue ) {
+    const newScope = { ... this.state.scope };
+
+    newScope[scopeType] = newValue;
+
+    this.setState( {scope: newScope} );
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      companies : companies,
+      opportunities : opportunities,
+      interactions : interactions,
+      convoDeleteHandler : this.convoDeleteHandler.bind(this),
+      convoAddHandler : this.convoAddHandler.bind( this ),
+      scopeChangeHandler : this.scopeChange.bind( this ),
+
+      scope : {
+        company : null,
+        person : null,
+        opportunity : null
+      }
+    };
+  }
+  
+  render() {
+
+    const { theme } = this.props;
+    const [open, setOpen] = this.props['open'];
+    
+    const handleDrawerOpen = () => {
+      setOpen(true);
+    };
+  
+    const handleDrawerClose = () => {
+      setOpen(false);
+    };
+
+    return (
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <AppBar position="fixed" open={open}>
+          <Toolbar>
+            <Typography variant="h6" noWrap sx={{ flexGrow: 1 }} component="div">
+              Opportunities will go here
+            </Typography>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="end"
+              onClick={handleDrawerOpen}
+              sx={{ ...(open && { display: 'none' }) }}
+            >
+              <MessageOutlinedIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <Main open={open}>
+          <DrawerHeader />
+          <Typography paragraph>
+            <Opportunities opportunities={this.state.opportunities} companies={this.state.companies} people={this.state.people} convoDeleteHandler={this.state.convoDeleteHandler} convoAddHandler={this.state.convoAddHandler} />
           </Typography>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="end"
-            onClick={handleDrawerOpen}
-            sx={{ ...(open && { display: 'none' }) }}
-          >
-            <MessageOutlinedIcon />
-          </IconButton>
-        </Toolbar>
-      </AppBar>
-      <Main open={open}>
-        <DrawerHeader />
-        <Typography paragraph>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-          tempor incididunt ut labore et dolore magna aliqua. Rhoncus dolor purus non
-          enim praesent elementum facilisis leo vel. Risus at ultrices mi tempus
-          imperdiet. Semper risus in hendrerit gravida rutrum quisque non tellus.
-          Convallis convallis tellus id interdum velit laoreet id donec ultrices.
-          Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-          adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra
-          nibh cras. Metus vulputate eu scelerisque felis imperdiet proin fermentum
-          leo. Mauris commodo quis imperdiet massa tincidunt. Cras tincidunt lobortis
-          feugiat vivamus at augue. At augue eget arcu dictum varius duis at
-          consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
-          sapien faucibus et molestie ac.
-        </Typography>
-        <Typography paragraph>
-          Consequat mauris nunc congue nisi vitae suscipit. Fringilla est ullamcorper
-          eget nulla facilisi etiam dignissim diam. Pulvinar elementum integer enim
-          neque volutpat ac tincidunt. Ornare suspendisse sed nisi lacus sed viverra
-          tellus. Purus sit amet volutpat consequat mauris. Elementum eu facilisis
-          sed odio morbi. Euismod lacinia at quis risus sed vulputate odio. Morbi
-          tincidunt ornare massa eget egestas purus viverra accumsan in. In hendrerit
-          gravida rutrum quisque non tellus orci ac. Pellentesque nec nam aliquam sem
-          et tortor. Habitant morbi tristique senectus et. Adipiscing elit duis
-          tristique sollicitudin nibh sit. Ornare aenean euismod elementum nisi quis
-          eleifend. Commodo viverra maecenas accumsan lacus vel facilisis. Nulla
-          posuere sollicitudin aliquam ultrices sagittis orci a.
-        </Typography>
-      </Main>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
+          
+        </Main>
+        <Drawer
+          sx={{
             width: drawerWidth,
-          },
-        }}
-        variant="persistent"
-        anchor="right"
-        open={open}
-      >
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <div className="Conversation">
-          <Conversation />
-        </div>
-      </Drawer>
-    </Box>
-  );
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+            },
+          }}
+          variant="persistent"
+          anchor="right"
+          open={open}
+        >
+          <DrawerHeader>
+            <IconButton onClick={handleDrawerClose}>
+              {theme.direction === 'rtl' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+          </DrawerHeader>
+          <Divider />
+          <div className="Conversation">
+            <Conversation interactions={this.state.interactions} convoDeleteHandler={this.state.convoDeleteHandler} convoAddHandler={this.state.convoAddHandler}/>
+          </div>
+        </Drawer>
+      </Box>
+    );
+  }
 }
