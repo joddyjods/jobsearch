@@ -29,6 +29,10 @@ class Conversation extends React.Component {
       this.state = props;
     }
 
+    componentWillReceiveProps(newProps){
+        this.setState({scope: newProps.scope})
+        }
+
     deleteMessage( id ) {
         this.state.convoDeleteHandler(id);
     }
@@ -42,7 +46,7 @@ class Conversation extends React.Component {
       newstate.interactions.push( {from: who, date: when, msg: msg, key: key } );
       this.setState( newstate );
     }
-  
+
     getIcon( source ) {
       if ( source == 'website' ) {
         return (
@@ -78,19 +82,49 @@ class Conversation extends React.Component {
   
       return ( <EmailIcon /> );
     }
+
+    scopeInteractions( interactions ) {
+
+        const scopedInteractions = [];
+        
+        for ( var i = 0; i < interactions.length; ++i )
+        {
+          let keepIt = true;
+    
+          if ( this.state.scope.opportunity != null && interactions[i].opptyId != this.state.scope.opportunity ) {
+            keepIt = false;
+          }
+    
+          if ( this.state.scope.company != null && interactions[i].companyId != this.state.scope.company ) {
+            keepIt = false;
+          }
+
+          if ( this.state.scope.person != null && interactions[i].personId != this.state.scope.person ) {
+            keepIt = false;
+          }
+    
+          if ( keepIt ) {
+            scopedInteractions.push( interactions[i] );
+          }
+        }
+    
+        return scopedInteractions;
+      }
   
     render() {
       
-      const interactions = this.state.interactions;
+      let interactions = this.scopeInteractions( this.state.interactions );
       let i = 0;
-  
+
       let output = interactions.map(interaction => {
         
-        let key = 'ConversationLine' + i++;
+        interaction.key = 'ConversationLine' + i;
+        interaction.textkey = 'TextKey' + i;
+        i++;
   
         return ( 
           <span>
-          <ListItem alignItems="flex-start">
+          <ListItem alignItems="flex-start" key={interaction.key}>
             <ListItemAvatar>
               {this.getIcon(interaction.source)}
             </ListItemAvatar>

@@ -32,70 +32,6 @@ you add information.
 The children use callbacks to add items as well as to change the scope.
 
 */
-// TODO - allow selection of opportunity and use it to scope conversations 
-// TODO - consider moving all of the maps up to the top-level app (or even the API) rather than building them in render functions
-
-/*
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import InboxIcon from '@mui/icons-material/Inbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
-
-export default function SelectedListItem() {
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
-
-  const handleListItemClick = (event, index) => {
-    setSelectedIndex(index);
-  };
-
-  return (
-    <Box sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-      <List component="nav" aria-label="main mailbox folders">
-        <ListItemButton
-          selected={selectedIndex === 0}
-          onClick={(event) => handleListItemClick(event, 0)}
-        >
-          <ListItemIcon>
-            <InboxIcon />
-          </ListItemIcon>
-          <ListItemText primary="Inbox" />
-        </ListItemButton>
-        <ListItemButton
-          selected={selectedIndex === 1}
-          onClick={(event) => handleListItemClick(event, 1)}
-        >
-          <ListItemIcon>
-            <DraftsIcon />
-          </ListItemIcon>
-          <ListItemText primary="Drafts" />
-        </ListItemButton>
-      </List>
-      <Divider />
-      <List component="nav" aria-label="secondary mailbox folder">
-        <ListItemButton
-          selected={selectedIndex === 2}
-          onClick={(event) => handleListItemClick(event, 2)}
-        >
-          <ListItemText primary="Trash" />
-        </ListItemButton>
-        <ListItemButton
-          selected={selectedIndex === 3}
-          onClick={(event) => handleListItemClick(event, 3)}
-        >
-          <ListItemText primary="Spam" />
-        </ListItemButton>
-      </List>
-    </Box>
-  );
-}
-
-
-*/
 
 
 const drawerWidth = 700;
@@ -148,9 +84,9 @@ const people = [
 ];
 
 const interactions = [
-  {id: 1, source: 'website', from: 'you', date: 'May 4, 2022', msg: 'Applied at the website', key:'abc'},
-  {id: 2, source: 'email', from: 'Charles English', date: 'May 5, 2022', msg: 'Responded with an email', key:'123'},
-  {id: 3, source: 'message', from: 'you', date: 'May 6, 2022', msg: 'Provided times for an interview.  I told them that I didnt really care when the times were and gave them lots of times and then even more times, and then some other things happened', key:'asdf'}
+  {id: 1, source: 'website', from: 'you', date: 'May 4, 2022', msg: 'Applied at the website', key:'abc', opptyId : '1001', personId : 10001},
+  {id: 2, source: 'email', from: 'Charles English', date: 'May 5, 2022', msg: 'Responded with an email', key:'123', opptyId : '1001', personId : 10002},
+  {id: 3, source: 'message', from: 'you', date: 'May 6, 2022', msg: 'Provided times for an interview.  I told them that I didnt really care when the times were and gave them lots of times and then even more times, and then some other things happened', key:'asdf', opptyId : '1003', personId : 10002}
 ];
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -242,11 +178,11 @@ class App extends React.Component {
     const newScope = { ... this.state.scope };
 
     newScope[scopeType] = newValue;
-
     this.setState( {scope: newScope} );
   }
 
-  constructor(props) {
+
+ constructor(props) {
     super(props);
 
     this.state = {
@@ -300,7 +236,7 @@ class App extends React.Component {
         <Main open={open}>
           <DrawerHeader />
           <Typography paragraph>
-            <Opportunities opportunities={this.state.opportunities} companies={this.state.companies} people={this.state.people} convoDeleteHandler={this.state.convoDeleteHandler} convoAddHandler={this.state.convoAddHandler} />
+            <Opportunities opportunities={this.state.opportunities} companies={this.state.companies} people={this.state.people} scopeChangeHandler={this.state.scopeChangeHandler} />
           </Typography>
           
         </Main>
@@ -323,7 +259,7 @@ class App extends React.Component {
           </DrawerHeader>
           <Divider />
           <div className="Conversation">
-            <Conversation interactions={this.state.interactions} convoDeleteHandler={this.state.convoDeleteHandler} convoAddHandler={this.state.convoAddHandler}/>
+            <Conversation scope={this.state.scope} interactions={this.state.interactions} convoDeleteHandler={this.state.convoDeleteHandler} convoAddHandler={this.state.convoAddHandler}/>
           </div>
         </Drawer>
       </Box>

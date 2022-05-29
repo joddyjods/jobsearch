@@ -14,10 +14,16 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import PhoneIcon from '@mui/icons-material/Phone';
 import VideoIcon from '@mui/icons-material/VideoCameraFront';
 
+import Box from '@mui/material/Box';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import InboxIcon from '@mui/icons-material/Inbox';
+import DraftsIcon from '@mui/icons-material/Drafts';
+
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 
-export default function render( props ) {
+export default function Render( props ) {
     return ( <Opportunities  {...props}></Opportunities> );
 }
 
@@ -26,7 +32,13 @@ class Opportunities extends React.Component {
     constructor(props) {
         super(props);
         this.state = props;
+        this.setState( {selectedIndex : 0} );
       }
+
+    handleListItemClick = (event, index, opportunityId ) => {   
+        this.setState( {selectedIndex : index} );
+        this.state.scopeChangeHandler( 'opportunity', opportunityId );
+      };
   
     dataEnterNewMessage() {
       this.addMessage( 'you', 'May 9, 2022', 'Did some other things','92fjdi' );
@@ -36,42 +48,6 @@ class Opportunities extends React.Component {
       let newstate = this.state;
       newstate.interactions.push( {from: who, date: when, msg: msg, key: key } );
       this.setState( newstate );
-    }
-  
-    getIcon( source ) {
-      if ( source == 'website' ) {
-        return (
-          <WebIcon />
-        );
-      }
-      if ( source == 'email' ) {
-        return (
-          <EmailIcon />
-        );
-      }
-      if ( source == 'message' ) {
-        return (
-          <TextsmsIcon />
-        );
-      }
-  
-      if ( source == 'linkedin' ) {
-        return (
-          <LinkedInIcon />
-        );
-      }
-      if ( source == 'phone' ) {
-        return (
-          <PhoneIcon />
-        );
-      }
-      if ( source == 'video' ) {
-        return (
-          <VideoIcon />
-        );
-      }
-  
-      return ( <EmailIcon /> );
     }
 
     mapCompanies( companies ) {
@@ -109,52 +85,55 @@ class Opportunities extends React.Component {
     
     render() {
       
+
+    
       const opportunities = this.enrichOpportunities( this.state.opportunities, this.state.companies, this.state.people );
+      
       let i = 0;
   
       let output = opportunities.map(oppty => {
   
-        let key = 'Opptyline' + i++;
+        oppty.lineIndex = i;
+        oppty.key = 'Opptyline' + i++;
+        oppty.textkey = 'Opptyline' + i++;
+        
         return ( 
-          <span>
-          <ListItem alignItems="flex-start">
-            <ListItemAvatar>
-              {this.getIcon(oppty.source)}
-            </ListItemAvatar>
-            <ListItemText
-              primary={oppty.jobtitle}
-              secondary={
-                <React.Fragment>
-                  <Typography
-                    sx={{ display: 'inline' }}
-                    component="span"
-                    variant="body2"
-                    color="text.primary"
-                  >
-                    {oppty.company.name}
-                  </Typography>
-                </React.Fragment>
-              }
-            />
-          </ListItem>
-          <Divider variant="inset" component="li" />
-          </span>
-          );
+            <ListItemButton
+                selected={this.state.selectedIndex === oppty.lineIndex} 
+                onClick={(event) => this.handleListItemClick(event, oppty.lineIndex, oppty.id)}
+                key={oppty.key}
+                >
+                <ListItemIcon  >
+                    <InboxIcon />
+                </ListItemIcon>
+                <ListItemText key={oppty.textkey} primary={oppty.jobtitle} 
+                secondary={
+                    <React.Fragment>
+                      <Typography
+                        sx={{ display: 'inline' }}
+                        component="span"
+                        variant="body2"
+                        color="text.primary"
+                      >
+                        {oppty.company.name}
+                      </Typography>
+                    </React.Fragment>
+                  }/>
+            </ListItemButton>
+        );
       });
   
   
     return (
       <span>
-    <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+    <Box sx={{ width: '100%', maxWidth: 1200, bgcolor: 'background.paper' }}>
+      <List component="nav" aria-label="main mailbox folders">
         {output}
-    </List>
-      <div className='AddOne'>
-        <Button variant="outlined" onClick={() =>this.dataEnterNewMessage()}>
-          + Add a thing
-        </Button>
-        
-      </div>
+        </List>
+    </Box>
       </span>
     )
-    } 
   }
+
+
+}
