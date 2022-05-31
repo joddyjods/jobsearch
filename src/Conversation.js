@@ -19,14 +19,35 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 
+import InteractionEditor from './InteractionEditor';
+
 export default function render( props ) {
     return ( <Conversation {...props}></Conversation> );
 }
+
+
 
 class Conversation extends React.Component {
     constructor(props) {
       super(props);
       this.state = props;
+    }
+
+    getNameFor( personId ) {
+      let name = 'Unknown!';
+      for ( var i = 0; i < this.state.people.length; ++i ) {
+        if ( this.state.people[i].id == personId ) {
+          name = this.state.people[i].first + ' ' + this.state.people[i].last; 
+        }
+      }
+      return name;
+    }
+
+    directionalizeInteraction( person, fromYou ) {
+      if ( fromYou ) {
+        return "You ==> " + person;
+      }
+      else return person + " ==> You";
     }
 
     componentWillReceiveProps(newProps){
@@ -38,15 +59,9 @@ class Conversation extends React.Component {
     }
   
     dataEnterNewMessage() {
-        this.state.convoAddHandler( 'linkedin', 'you', 'May 9, 2022', 'Did some other things' );
+        this.state.convoAddHandler( 'linkedin', 'you', 'May 9, 2022', 'Did some other things', this.state.scope.company, this.state.scope.opportunity, this.state.scope.person );
     }
   
-    addMessage( who, when, msg, key ) {
-      let newstate = this.state;
-      newstate.interactions.push( {from: who, date: when, msg: msg, key: key } );
-      this.setState( newstate );
-    }
-
     getIcon( source ) {
       if ( source == 'website' ) {
         return (
@@ -110,7 +125,7 @@ class Conversation extends React.Component {
     
         return scopedInteractions;
       }
-  
+
     render() {
       
       let interactions = this.scopeInteractions( this.state.interactions );
@@ -129,7 +144,7 @@ class Conversation extends React.Component {
               {this.getIcon(interaction.source)}
             </ListItemAvatar>
             <ListItemText
-              primary={interaction.from}
+              primary={this.directionalizeInteraction( this.getNameFor( interaction.personId ), interaction.fromYou )}
               secondary={
                 <React.Fragment>
                   <Typography
@@ -159,12 +174,15 @@ class Conversation extends React.Component {
     <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
         {output}
     </List>
-      <div className='AddOne'>
-        <Button variant="outlined" onClick={() =>this.dataEnterNewMessage()}>
-          + Add a thing
-        </Button>
-        
-      </div>
+        <InteractionEditor 
+          scope={this.state.scope} 
+          opportunities={this.state.opportunities} 
+          companies={this.state.companies} 
+          people={this.state.people}
+          convoAddHandler={this.state.convoAddHandler}
+          >
+
+        </InteractionEditor>
       </span>
     )
     } 

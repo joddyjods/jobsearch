@@ -84,9 +84,9 @@ const people = [
 ];
 
 const interactions = [
-  {id: 1, source: 'website', from: 'you', date: 'May 4, 2022', msg: 'Applied at the website', key:'abc', opptyId : '1001', personId : 10001},
-  {id: 2, source: 'email', from: 'Charles English', date: 'May 5, 2022', msg: 'Responded with an email', key:'123', opptyId : '1001', personId : 10002},
-  {id: 3, source: 'message', from: 'you', date: 'May 6, 2022', msg: 'Provided times for an interview.  I told them that I didnt really care when the times were and gave them lots of times and then even more times, and then some other things happened', key:'asdf', opptyId : '1003', personId : 10002}
+  {id: 1, source: 'website', fromYou : true, date: 'May 4, 2022', msg: 'Applied at the website', key:'abc', opptyId : '1001', personId : 10001},
+  {id: 2, source: 'email', fromYou : false, date: 'May 5, 2022', msg: 'Responded with an email', key:'123', opptyId : '1001', personId : 10002},
+  {id: 3, source: 'message', fromYou : true, date: 'May 6, 2022', msg: 'Provided times for an interview.  I told them that I didnt really care when the times were and gave them lots of times and then even more times, and then some other things happened', key:'asdf', opptyId : '1003', personId : 10002}
 ];
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -156,16 +156,43 @@ class App extends React.Component {
     this.setState( {interactions: interactions} );
   }
 
-  convoAddHandler( source, from, date, msg ) {
+  convoAddHandler( newInteraction ) {
     let interactions = this.state.interactions;
+    let nextId = this.generateNextId();
+
+    let companyId = newInteraction.companyId;
+    let opptyId = newInteraction.opptyId;
+
+    if ( companyId == -1 ) {
+      // TODO: Create the company add handler
+      // TODO: Create the company
+
+      // We can't use an opportunity that is aligned to the wrong company, so create a new one no matter what
+      opptyId = -1;
+    }
+
+    if ( opptyId == -1 ) {
+      // TODO: Create the opportunity add handler
+      // TODO: Create the opportunity
+    }
+
+    if ( newInteraction.personId == -1 ) {
+      // Create the person add handler
+      // TODO: create the person
+    }
+
     interactions.push( {
-      id: 55, 
-      source: source,
-      from: from,
-      date: date,
-      msg: msg,
-      key: 'asldfkjalsdkfj'
+      id: nextId, 
+      source: newInteraction.source,
+      fromYou: newInteraction.fromYou,
+      date: newInteraction.date,
+      msg: newInteraction.msg,
+      key: nextId,
+      companyId : companyId,
+      personId : newInteraction.personId, 
+      opptyId : opptyId
     });
+
     this.setState( {interactions: interactions} );
   }
 
@@ -181,6 +208,12 @@ class App extends React.Component {
     this.setState( {scope: newScope} );
   }
 
+  generateNextId() {
+    let nextId = this.state.nextId;
+    this.setState( {nextId : ++nextId} );
+    return nextId;
+  }
+
 
  constructor(props) {
     super(props);
@@ -189,9 +222,11 @@ class App extends React.Component {
       companies : companies,
       opportunities : opportunities,
       interactions : interactions,
+      people : people,
       convoDeleteHandler : this.convoDeleteHandler.bind(this),
       convoAddHandler : this.convoAddHandler.bind( this ),
       scopeChangeHandler : this.scopeChange.bind( this ),
+      nextId : 9999999,
 
       scope : {
         company : null,
@@ -259,7 +294,7 @@ class App extends React.Component {
           </DrawerHeader>
           <Divider />
           <div className="Conversation">
-            <Conversation scope={this.state.scope} interactions={this.state.interactions} convoDeleteHandler={this.state.convoDeleteHandler} convoAddHandler={this.state.convoAddHandler}/>
+            <Conversation scope={this.state.scope} interactions={this.state.interactions} convoDeleteHandler={this.state.convoDeleteHandler} opportunities={this.state.opportunities} companies={this.state.companies} people={this.state.people} convoAddHandler={this.state.convoAddHandler}/>
           </div>
         </Drawer>
       </Box>
