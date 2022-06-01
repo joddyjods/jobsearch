@@ -137,8 +137,8 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 export default function Render(props) {
   
   const theme = useTheme();
-  const setOpen = React.useState(false);
-  const open = React.useState(false);
+  const setOpen = React.useState(true);
+  const open = React.useState(true);
 
   return ( <App {...props} theme={theme} open={open}/> )
 }
@@ -156,6 +156,24 @@ class App extends React.Component {
     this.setState( {interactions: interactions} );
   }
 
+  addCompany( company ) {
+    company.id = this.generateNextId();
+    companies.push( company );
+    this.setState( { companies : companies } );
+  }
+
+  addOpportunity( oppty ) {
+    oppty.id = this.generateNextId();
+    opportunities.push( oppty );
+    this.setState( { opportunities : opportunities } );
+  }
+
+  addPerson( person ) {
+    person.id = this.generateNextId();
+    people.push( person );
+    this.setState( { people : people } );
+  }
+
   convoAddHandler( newInteraction ) {
     let interactions = this.state.interactions;
     let nextId = this.generateNextId();
@@ -164,22 +182,38 @@ class App extends React.Component {
     let opptyId = newInteraction.opptyId;
 
     if ( companyId == -1 ) {
-      // TODO: Create the company add handler
-      // TODO: Create the company
+
+      const newCompany = {
+        name : newInteraction.companyName
+      };
+      this.addCompany( newCompany );
+      companyId = newCompany.id;
 
       // We can't use an opportunity that is aligned to the wrong company, so create a new one no matter what
       opptyId = -1;
     }
 
     if ( opptyId == -1 ) {
-      // TODO: Create the opportunity add handler
-      // TODO: Create the opportunity
+      const newOpportunity = {
+        jobtitle : newInteraction.opptyName,
+        companyid : companyId
+      };
+      
+      this.addOpportunity( newOpportunity );
+      opptyId = newOpportunity.id;
     }
 
     if ( newInteraction.personId == -1 ) {
-      // Create the person add handler
-      // TODO: create the person
+      const newPerson = {
+        first : newInteraction.toFirst,
+        last : newInteraction.toLast
+      };
+
+      this.addPerson( newPerson );
+      newInteraction.personId = newPerson.id;
     }
+
+console.log( this.state );
 
     interactions.push( {
       id: nextId, 
@@ -255,7 +289,7 @@ class App extends React.Component {
         <AppBar position="fixed" open={open}>
           <Toolbar>
             <Typography variant="h6" noWrap sx={{ flexGrow: 1 }} component="div">
-              Opportunities will go here
+              Opportunities
             </Typography>
             <IconButton
               color="inherit"

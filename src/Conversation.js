@@ -15,6 +15,7 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import VideoIcon from '@mui/icons-material/VideoCameraFront';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
@@ -56,10 +57,6 @@ class Conversation extends React.Component {
 
     deleteMessage( id ) {
         this.state.convoDeleteHandler(id);
-    }
-  
-    dataEnterNewMessage() {
-        this.state.convoAddHandler( 'linkedin', 'you', 'May 9, 2022', 'Did some other things', this.state.scope.company, this.state.scope.opportunity, this.state.scope.person );
     }
   
     getIcon( source ) {
@@ -159,6 +156,9 @@ class Conversation extends React.Component {
                 </React.Fragment>
               }
             />
+            <IconButton edge="end" aria-label="Edit">
+                <EditIcon onClick={() => console.log( 'Edit it!  This does not work yet' )}/>
+            </IconButton>
             <IconButton edge="end" aria-label="delete">
                 <DeleteIcon onClick={() =>this.deleteMessage(interaction.id)}/>
             </IconButton>

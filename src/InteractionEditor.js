@@ -75,12 +75,10 @@ export default function InteractionEditor( props ) {
     // TODO - this is pretty darn error prone, so it needs eventual fixing.  Maybe just get rid of first and last names
     const toArray = to.split( " " );
 
-    const retVal = { to : -1, from : -1,
+    const retVal = { to : -1, 
         toFirst : toArray.length > 0 ? toArray[0] : '',
         toLast : toArray.length > 1 ? toArray[1] : '',
     };
-
-    
 
     if ( props.people != null ) {
         for ( var i = 0; i < props.people.length; ++i ) {
@@ -91,7 +89,6 @@ export default function InteractionEditor( props ) {
         }
     }
 
-    console.log( retVal );
     return retVal;
   }
 
@@ -120,8 +117,6 @@ export default function InteractionEditor( props ) {
         toFirst : interactionPeeps.toFirst,
         toLast : interactionPeeps.toLast,
     };
-
-    console.log( newInteraction );
 
     props.convoAddHandler( newInteraction );
     handleClose();
@@ -265,7 +260,7 @@ const StyledFab = styled(Fab)({
             onChange={(e, newValue) => setTo(newValue)} 
             onInputChange={(event, newInputValue) => { setTo(newInputValue); }}
             defaultValue={defaults.to}
-            renderInput={(params) => <TextField {...params} label="To" margin="dense" fullWidth variant="standard"  />}
+            renderInput={(params) => <TextField {...params} label="corresponded with" margin="dense" fullWidth variant="standard"  />}
           />    
           
           
