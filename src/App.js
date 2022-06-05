@@ -4,7 +4,7 @@ import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import CssBaseline from '@mui/material/CssBaseline';
 import Typography from '@mui/material/Typography';
@@ -86,7 +86,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 export default function Render(props) {
   
   const theme = useTheme();
-  const setOpen = React.useState(true);
   const open = React.useState(true);
 
   return ( <App {...props} theme={theme} open={open}/> )
@@ -95,14 +94,19 @@ export default function Render(props) {
 class App extends React.Component {
 
   convoDeleteHandler(id) {
-    let interactions = this.state.interactions;
-    for ( var i = interactions.length-1; i >= 0; --i ) {
-      if ( interactions[i].id == id ) {
-        interactions.splice( i, 1 );
-      }
-    }
+    const requestOptions = {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : serverUrl },
+    };
 
-    this.setState( {interactions: interactions} );
+    var url = new URL( serverUrl + "interactions" );
+    var params = { id : id };
+    url.search = new URLSearchParams( params ).toString();
+
+    fetch( url, requestOptions)
+        .then(response => response.json())
+        .then( data => console.log( data ) );
+
   }
 
   addCompany( company ) {
@@ -123,7 +127,6 @@ class App extends React.Component {
     this.setState( { people : this.state.people } );
   }
 
-  // TODO - call the update on the server
   convoAddHandler( newInteraction ) {
 
     const requestOptions = {
@@ -136,57 +139,6 @@ class App extends React.Component {
         .then(response => response.json())
         .then( data => console.log( data ) );
 
-    /*let interactions = this.state.interactions;
-    let nextId = this.generateNextId();
-
-    let companyId = newInteraction.companyId;
-    let opptyId = newInteraction.opptyId;
-
-    if ( companyId == -1 ) {
-
-      const newCompany = {
-        name : newInteraction.companyName
-      };
-      this.addCompany( newCompany );
-      companyId = newCompany.id;
-
-      // We can't use an opportunity that is aligned to the wrong company, so create a new one no matter what
-      opptyId = -1;
-    }
-
-    if ( opptyId == -1 ) {
-      const newOpportunity = {
-        jobtitle : newInteraction.opptyName,
-        companyid : companyId
-      };
-      
-      this.addOpportunity( newOpportunity );
-      opptyId = newOpportunity.id;
-    }
-
-    if ( newInteraction.personId == -1 ) {
-      const newPerson = {
-        first : newInteraction.toFirst,
-        last : newInteraction.toLast
-      };
-
-      this.addPerson( newPerson );
-      newInteraction.personId = newPerson.id;
-    }
-
-    appdata.interactions.push( {
-      id: nextId, 
-      source: newInteraction.source,
-      fromYou: newInteraction.fromYou,
-      date: newInteraction.date,
-      msg: newInteraction.msg,
-      key: nextId,
-      companyId : companyId,
-      personId : newInteraction.personId, 
-      opptyId : opptyId
-    });
-
-    this.setState( {interactions: interactions} );*/
   }
 
   /**
@@ -195,7 +147,7 @@ class App extends React.Component {
    * @param {*} newValue The ID of the object to scope down to, or null for unscoped
    */
   scopeChange( scopeType, newValue ) {
-    const newScope = { ... this.state.scope };
+    const newScope = { ...this.state.scope };
 
     newScope[scopeType] = newValue;
     this.setState( {scope: newScope} );
@@ -251,8 +203,6 @@ class App extends React.Component {
           retryCount={3} // this is optional
           headers={ { 'Access-Control-Allow-Origin' : serverUrl } }
           onSuccess={resp => {
-              console.log( "refresh" );
-              console.log( resp );
               this.setState( {opportunities : resp.opportunities} );
               this.setState( {companies : resp.companies} );
               this.setState( {interactions : resp.interactions} );
@@ -290,9 +240,7 @@ class App extends React.Component {
         </AppBar>
         <Main open={open}>
           <DrawerHeader />
-          <Typography paragraph>
             <Opportunities opportunities={this.state.opportunities} companies={this.state.companies} people={this.state.people} scopeChangeHandler={this.state.scopeChangeHandler} />
-          </Typography>
           
         </Main>
         <Drawer

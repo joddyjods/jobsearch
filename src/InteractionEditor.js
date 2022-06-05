@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -14,7 +14,6 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 
-import Stack from '@mui/material/Stack';
 import Autocomplete from '@mui/material/Autocomplete';
 
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -51,20 +50,17 @@ export default function InteractionEditor( props ) {
     const retVal = { company : -1, opportunity : -1 };
     if ( props.opportunities != null ) {
             for ( var i = 0; i < props.opportunities.length; ++i ) {
-                if ( props.opportunities[i].jobtitle == opportunity ) {
-console.log( "FOUND THE OPPORTUNITY" );
-                    if ( getCompanyNameForId(props.opportunities[i].company, props) == company ) {
-console.log( "FOUND THE COMPANY" );
-console.log( props.opportunities[i].companyid );
+                if ( props.opportunities[i].jobtitle === opportunity ) {
+                    if ( getCompanyNameForId(props.opportunities[i].company, props) === company ) {
                         retVal.company = props.opportunities[i].company;
                         retVal.opportunity = props.opportunities[i].id;
                     }
                 }
             }
         }
-        if ( retVal.company == -1 ) {
-            for ( var i = 0; i < props.companies.length; ++i ) {
-                if ( props.companies[i].name == company ) {
+        if ( retVal.company === -1 ) {
+            for ( i = 0; i < props.companies.length; ++i ) {
+                if ( props.companies[i].name === company ) {
                     retVal.company = props.companies[i].id;
                 }
             }
@@ -85,7 +81,7 @@ console.log( props.opportunities[i].companyid );
     if ( props.people != null ) {
         for ( var i = 0; i < props.people.length; ++i ) {
 
-            if ( props.people[i].first + " " + props.people[i].last  == to ) {
+            if ( props.people[i].first + " " + props.people[i].last  === to ) {
                 retVal.to = props.people[i].id;
             }
         }
@@ -128,7 +124,7 @@ console.log( props.opportunities[i].companyid );
   const getCompanyNameForId = (companyId, props) => {
     if ( props.companies != null ) {
         for ( var i = 0; i < props.companies.length; ++i ) {
-            if ( props.companies[i].id == companyId ) {
+            if ( props.companies[i].id === companyId ) {
                 return props.companies[i].name;
             }
         }
@@ -139,9 +135,9 @@ console.log( props.opportunities[i].companyid );
   const populateDefaultsFromOpportunity = (opportunityId, props, defaults) => {
     if ( props.opportunities != null ) {
         for ( var i = 0; i < props.opportunities.length; ++i ) {
-            if ( props.opportunities[i].id == opportunityId ) {
+            if ( props.opportunities[i].id === opportunityId ) {
                 defaults.opportunity = props.opportunities[i].jobtitle;
-                defaults.company = getCompanyNameForId( props.opportunities[i].companyid, props, defaults );
+                defaults.company = getCompanyNameForId( props.opportunities[i].company, props, defaults );
             }
         }
     }
@@ -156,7 +152,7 @@ console.log( props.opportunities[i].companyid );
     defaults.fromYou = false;
     defaults.to = "";
     defaults.date = new Date().toLocaleDateString('en-US');
-
+    
     // Put together the defaults based on scope
     if ( props.scope.company != null ) {
         defaults.company = getCompanyNameForId( props.scope.company, props );
@@ -180,12 +176,6 @@ console.log( props.opportunities[i].companyid );
     return defaults;
   }
 
-  const [source, setSource] = React.useState('');
-  
-  const handleSelectChange = (event) => {
-    setSource(event.target.value);
-  };
-  
   const [thesource, setTheSource] = React.useState( '' );
   const [companyName, setCompanyName] = React.useState( '' );
   const [opportunityName, setOpportunityName] = React.useState( '' );

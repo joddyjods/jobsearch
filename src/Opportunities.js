@@ -1,27 +1,13 @@
 import './Opportunities.css';
 import * as React from 'react';
-import { styled, useTheme } from '@mui/material/styles';
-import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import EmailIcon from '@mui/icons-material/EmailOutlined';
-import WebIcon from '@mui/icons-material/Web';
-import TextsmsIcon from '@mui/icons-material/Textsms';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import PhoneIcon from '@mui/icons-material/Phone';
-import VideoIcon from '@mui/icons-material/VideoCameraFront';
 
 import Box from '@mui/material/Box';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import InboxIcon from '@mui/icons-material/Inbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
-
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import Avatar from '@mui/material/Avatar';
 
 export default function Render( props ) {
     return ( <Opportunities  {...props}></Opportunities> );
@@ -29,15 +15,9 @@ export default function Render( props ) {
 
 
 class Opportunities extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = props;
-        this.setState( {selectedIndex : 0} );
-      }
-
     handleListItemClick = (event, index, opportunityId ) => {   
         this.setState( {selectedIndex : index} );
-        this.state.scopeChangeHandler( 'opportunity', opportunityId );
+        this.props.scopeChangeHandler( 'opportunity', opportunityId );
       };
   
     dataEnterNewMessage() {
@@ -67,7 +47,7 @@ class Opportunities extends React.Component {
 
         for ( var i = 0; i < oppties.length; ++i ) {
             // Spread/clone the opportunity
-            let oppty = { ... oppties[i] };
+            let oppty = { ...oppties[i] };
 
             // Enrich it with the company name
             oppty.company = companyMap[oppty.company];
@@ -97,7 +77,7 @@ class Opportunities extends React.Component {
 
         return ( 
             <ListItemButton
-                selected={this.state.selectedIndex === oppty.lineIndex} 
+                selected={this.props.selectedIndex === oppty.lineIndex} 
                 onClick={(event) => this.handleListItemClick(event, oppty.lineIndex, oppty.id)}
                 key={oppty.key}
                 >
