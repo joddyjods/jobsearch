@@ -16,6 +16,8 @@ import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import Conversation from './Conversation';
 import Opportunities from './Opportunities';
 
+import ReactPolling from "react-polling";
+
 /*
 
 The App has flat lists of companies, opportunities, people and conversations.  
@@ -33,61 +35,8 @@ The children use callbacks to add items as well as to change the scope.
 
 */
 
-
 const drawerWidth = 700;
-
-const companies = [
-  {
-    id : 1,
-    name : 'Amazon'
-  },
-  {
-    id : 2,
-    name : 'Kava.io'
-  }
-];
-
-const opportunities = [
-  {
-    id : 1001,
-    companyid : 1,
-    jobtitle : 'Sr Software Development Manager, Go',
-    hiringmanager : 10001
-  },
-  {
-    id : 1002,
-    companyid : 1,
-    jobtitle : 'Sr Software Development Manager, Assets',
-    hiringmanager : -1
-  },
-  {
-    id : 1003,
-    companyid : 2,
-    jobtitle : 'Vice President, Engineering',
-    hiringmanager : 10002
-  }
-];
-
-const people = [
-  { 
-    id : 10001,
-    first : 'Charles',
-    last : 'Jansen',
-    title : 'Director, Amazon Go'
-  },
-  { 
-    id : 10002,
-    first : 'Jason',
-    last : 'Ward',
-    title : 'Senior Vice President, Engineering'
-  }
-];
-
-const interactions = [
-  {id: 1, source: 'website', fromYou : true, date: 'May 4, 2022', msg: 'Applied at the website', key:'abc', opptyId : '1001', personId : 10001},
-  {id: 2, source: 'email', fromYou : false, date: 'May 5, 2022', msg: 'Responded with an email', key:'123', opptyId : '1001', personId : 10002},
-  {id: 3, source: 'message', fromYou : true, date: 'May 6, 2022', msg: 'Provided times for an interview.  I told them that I didnt really care when the times were and gave them lots of times and then even more times, and then some other things happened', key:'asdf', opptyId : '1003', personId : 10002}
-];
+const serverUrl = 'http://localhost:8080/all';
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
@@ -158,24 +107,25 @@ class App extends React.Component {
 
   addCompany( company ) {
     company.id = this.generateNextId();
-    companies.push( company );
-    this.setState( { companies : companies } );
+    this.state.companies.push( company );
+    this.setState( { companies : this.state.companies } );
   }
 
   addOpportunity( oppty ) {
     oppty.id = this.generateNextId();
-    opportunities.push( oppty );
-    this.setState( { opportunities : opportunities } );
+    this.state.opportunities.push( oppty );
+    this.setState( { opportunities : this.state.opportunities } );
   }
 
   addPerson( person ) {
     person.id = this.generateNextId();
-    people.push( person );
-    this.setState( { people : people } );
+    this.state.people.push( person );
+    this.setState( { people : this.state.people } );
   }
 
+  // TODO - call the update on the server
   convoAddHandler( newInteraction ) {
-    let interactions = this.state.interactions;
+    /*let interactions = this.state.interactions;
     let nextId = this.generateNextId();
 
     let companyId = newInteraction.companyId;
@@ -213,9 +163,7 @@ class App extends React.Component {
       newInteraction.personId = newPerson.id;
     }
 
-console.log( this.state );
-
-    interactions.push( {
+    appdata.interactions.push( {
       id: nextId, 
       source: newInteraction.source,
       fromYou: newInteraction.fromYou,
@@ -227,7 +175,7 @@ console.log( this.state );
       opptyId : opptyId
     });
 
-    this.setState( {interactions: interactions} );
+    this.setState( {interactions: interactions} );*/
   }
 
   /**
@@ -253,10 +201,10 @@ console.log( this.state );
     super(props);
 
     this.state = {
-      companies : companies,
-      opportunities : opportunities,
-      interactions : interactions,
-      people : people,
+      companies : [],
+      opportunities : [],
+      interactions : [],
+      people : [],
       convoDeleteHandler : this.convoDeleteHandler.bind(this),
       convoAddHandler : this.convoAddHandler.bind( this ),
       scopeChangeHandler : this.scopeChange.bind( this ),
@@ -285,6 +233,33 @@ console.log( this.state );
 
     return (
       <Box sx={{ display: 'flex' }}>
+
+        <ReactPolling
+          url={serverUrl}
+          interval= {2000} // in milliseconds(ms)
+          retryCount={3} // this is optional
+          headers={ { 'Access-Control-Allow-Origin' : 'http://localhost:8080' } }
+          onSuccess={resp => {
+              console.log( "refresh" );
+              console.log( resp );
+              this.setState( {opportunities : resp.opportunities} );
+              this.setState( {companies : resp.companies} );
+              this.setState( {interactions : resp.interactions} );
+              this.setState( {people : resp.people } );
+              return true;
+            }
+          }
+          onFailure={resp => {
+            console.log({ resp });
+            return true;
+          }} // this is optional
+          method={'GET'}
+          // body={JSON.stringify("hello")} // data to send in a post call. Should be stringified always
+          render={({ startPolling, stopPolling, isPolling }) => {
+            
+          }}
+        />
+
         <CssBaseline />
         <AppBar position="fixed" open={open}>
           <Toolbar>

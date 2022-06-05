@@ -70,7 +70,7 @@ class Opportunities extends React.Component {
             let oppty = { ... oppties[i] };
 
             // Enrich it with the company name
-            oppty.company = companyMap[oppty.companyid];
+            oppty.company = companyMap[oppty.company];
 
 
             // Enrich it with all associated contacts
@@ -84,10 +84,8 @@ class Opportunities extends React.Component {
     }
     
     render() {
-      
-
     
-      const opportunities = this.enrichOpportunities( this.state.opportunities, this.state.companies, this.state.people );
+      const opportunities = this.enrichOpportunities( this.props.opportunities, this.props.companies, this.props.people );
       
       let i = 0;
   
@@ -96,7 +94,7 @@ class Opportunities extends React.Component {
         oppty.lineIndex = i;
         oppty.key = 'Opptyline' + i++;
         oppty.textkey = 'Opptyline' + i++;
-        
+
         return ( 
             <ListItemButton
                 selected={this.state.selectedIndex === oppty.lineIndex} 

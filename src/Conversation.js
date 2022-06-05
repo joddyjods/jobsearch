@@ -36,9 +36,9 @@ class Conversation extends React.Component {
 
     getNameFor( personId ) {
       let name = 'Unknown!';
-      for ( var i = 0; i < this.state.people.length; ++i ) {
-        if ( this.state.people[i].id == personId ) {
-          name = this.state.people[i].first + ' ' + this.state.people[i].last; 
+      for ( var i = 0; i < this.props.people.length; ++i ) {
+        if ( this.props.people[i].id == personId ) {
+          name = this.props.people[i].first + ' ' + this.props.people[i].last; 
         }
       }
       return name;
@@ -103,15 +103,15 @@ class Conversation extends React.Component {
         {
           let keepIt = true;
     
-          if ( this.state.scope.opportunity != null && interactions[i].opptyId != this.state.scope.opportunity ) {
+          if ( this.props.scope.opportunity != null && interactions[i].opptyId != this.props.scope.opportunity ) {
             keepIt = false;
           }
     
-          if ( this.state.scope.company != null && interactions[i].companyId != this.state.scope.company ) {
+          if ( this.props.scope.company != null && interactions[i].companyId != this.props.scope.company ) {
             keepIt = false;
           }
 
-          if ( this.state.scope.person != null && interactions[i].personId != this.state.scope.person ) {
+          if ( this.props.scope.person != null && interactions[i].personId != this.props.scope.person ) {
             keepIt = false;
           }
     
@@ -125,7 +125,7 @@ class Conversation extends React.Component {
 
     render() {
       
-      let interactions = this.scopeInteractions( this.state.interactions );
+      let interactions = this.scopeInteractions( this.props.interactions );
       let i = 0;
 
       let output = interactions.map(interaction => {
@@ -175,11 +175,11 @@ class Conversation extends React.Component {
         {output}
     </List>
         <InteractionEditor 
-          scope={this.state.scope} 
-          opportunities={this.state.opportunities} 
-          companies={this.state.companies} 
-          people={this.state.people}
-          convoAddHandler={this.state.convoAddHandler}
+          scope={this.props.scope} 
+          opportunities={this.props.opportunities} 
+          companies={this.props.companies} 
+          people={this.props.people}
+          convoAddHandler={this.props.convoAddHandler}
           >
 
         </InteractionEditor>
