@@ -36,7 +36,7 @@ The children use callbacks to add items as well as to change the scope.
 */
 
 const drawerWidth = 700;
-const serverUrl = 'http://localhost:8080/all';
+const serverUrl = 'http://localhost:8080/';
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
@@ -125,6 +125,17 @@ class App extends React.Component {
 
   // TODO - call the update on the server
   convoAddHandler( newInteraction ) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : serverUrl },
+        body: JSON.stringify( newInteraction )
+    };
+
+    fetch( serverUrl + "interactions", requestOptions)
+        .then(response => response.json())
+        .then( data => console.log( data ) );
+
     /*let interactions = this.state.interactions;
     let nextId = this.generateNextId();
 
@@ -235,10 +246,10 @@ class App extends React.Component {
       <Box sx={{ display: 'flex' }}>
 
         <ReactPolling
-          url={serverUrl}
+          url={serverUrl + "all"}
           interval= {2000} // in milliseconds(ms)
           retryCount={3} // this is optional
-          headers={ { 'Access-Control-Allow-Origin' : 'http://localhost:8080' } }
+          headers={ { 'Access-Control-Allow-Origin' : serverUrl } }
           onSuccess={resp => {
               console.log( "refresh" );
               console.log( resp );

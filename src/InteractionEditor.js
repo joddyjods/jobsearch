@@ -49,12 +49,14 @@ export default function InteractionEditor( props ) {
 
   const getCompanyAndOpportunity = (company, opportunity, props) => {
     const retVal = { company : -1, opportunity : -1 };
-
     if ( props.opportunities != null ) {
             for ( var i = 0; i < props.opportunities.length; ++i ) {
                 if ( props.opportunities[i].jobtitle == opportunity ) {
-                    if ( getCompanyNameForId(props.opportunities[i].companyid, props) == company ) {
-                        retVal.company = props.opportunities[i].companyid;
+console.log( "FOUND THE OPPORTUNITY" );
+                    if ( getCompanyNameForId(props.opportunities[i].company, props) == company ) {
+console.log( "FOUND THE COMPANY" );
+console.log( props.opportunities[i].companyid );
+                        retVal.company = props.opportunities[i].company;
                         retVal.opportunity = props.opportunities[i].id;
                     }
                 }
