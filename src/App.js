@@ -16,12 +16,14 @@ import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import Conversation from './Conversation';
 import Opportunities from './Opportunities';
 
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+
 import ReactPolling from "react-polling";
 
 /*
 
 The App has flat lists of companies, opportunities, people and conversations.  
-// TODO - it needs to get these from an API that will read/write them
 
 As changes occur, App will combine the flat lists to combine information that can be used for
 rendering different lists with rich information.  All of these are in its state.
@@ -87,8 +89,8 @@ export default function Render(props) {
   
   const theme = useTheme();
   const open = React.useState(true);
-
-  return ( <App {...props} theme={theme} open={open}/> )
+  
+  return ( <App {...props} theme={theme} open={open} /> )
 }
 
 class App extends React.Component {
@@ -180,12 +182,17 @@ class App extends React.Component {
       }
     };
   }
-  
+ 
+
   render() {
+
+    const Alert = React.forwardRef(function Alert(props, ref) {
+      return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    });
 
     const { theme } = this.props;
     const [open, setOpen] = this.props['open'];
-    
+
     const handleDrawerOpen = () => {
       setOpen(true);
     };
@@ -194,30 +201,45 @@ class App extends React.Component {
       setOpen(false);
     };
 
+    const handleAlertClose = (event, reason) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+  
+      this.setState( {synced : false});
+    };
+
     return (
       <Box sx={{ display: 'flex' }}>
 
         <ReactPolling
           url={serverUrl + "all"}
           interval= {2000} // in milliseconds(ms)
-          retryCount={3} // this is optional
+          retryCount={10} // this is optional
           headers={ { 'Access-Control-Allow-Origin' : serverUrl } }
           onSuccess={resp => {
               this.setState( {opportunities : resp.opportunities} );
               this.setState( {companies : resp.companies} );
               this.setState( {interactions : resp.interactions} );
               this.setState( {people : resp.people } );
+              this.setState( { synced : true });
+              this.setState( { commError : false } );
               return true;
             }
           }
           onFailure={resp => {
             console.log({ resp });
+            this.setState( { synced : false } );
+            this.setState( { commError : true } );
             return true;
           }} // this is optional
           method={'GET'}
-          // body={JSON.stringify("hello")} // data to send in a post call. Should be stringified always
           render={({ startPolling, stopPolling, isPolling }) => {
-            
+            return <Snackbar open={!isPolling} onClose={handleAlertClose}>
+                    <Alert severity="error" sx={{ width: '100%' }} onClose={handleAlertClose}>
+                      No longer attempting to contact the server.  Consider restarting.
+                    </Alert>
+                  </Snackbar>
           }}
         />
 
@@ -237,6 +259,16 @@ class App extends React.Component {
               <MessageOutlinedIcon />
             </IconButton>
           </Toolbar>
+        <Snackbar open={this.state.synced} onClose={handleAlertClose}>
+          <Alert severity="success" sx={{ width: '100%' }} onClose={handleAlertClose}>
+            Communicating with Server
+          </Alert>
+        </Snackbar>
+        <Snackbar open={this.state.commError} onClose={handleAlertClose}>
+          <Alert severity="error" sx={{ width: '100%' }} onClose={handleAlertClose}>
+            Error Communicating with Server
+          </Alert>
+        </Snackbar>
         </AppBar>
         <Main open={open}>
           <DrawerHeader />
@@ -262,7 +294,7 @@ class App extends React.Component {
           </DrawerHeader>
           <Divider />
           <div className="Conversation">
-            <Conversation scope={this.state.scope} interactions={this.state.interactions} convoDeleteHandler={this.state.convoDeleteHandler} opportunities={this.state.opportunities} companies={this.state.companies} people={this.state.people} convoAddHandler={this.state.convoAddHandler}/>
+            <Conversation scope={this.state.scope} interactions={this.state.interactions} convoDeleteHandler={this.state.convoDeleteHandler} opportunities={this.state.opportunities} companies={this.state.companies} people={this.state.people} commError={this.state.commError} convoAddHandler={this.state.convoAddHandler}/>
           </div>
         </Drawer>
       </Box>

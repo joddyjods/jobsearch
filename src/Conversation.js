@@ -49,7 +49,7 @@ class Conversation extends React.Component {
         }
 
     deleteMessage( id ) {
-        this.state.convoDeleteHandler(id);
+        this.props.convoDeleteHandler(id);
     }
   
     getIcon( source ) {
@@ -148,12 +148,8 @@ class Conversation extends React.Component {
                 </React.Fragment>
               }
             />
-            <IconButton edge="end" aria-label="Edit" onClick={() => console.log( 'Edit it!  This does not work yet' )}>
-                <EditIcon />
-            </IconButton>
-            <IconButton edge="end" aria-label="delete" onClick={() =>this.deleteMessage(interaction.id)}>
-                <DeleteIcon />
-            </IconButton>
+            { !this.props.commError && <IconButton edge="end" aria-label="Edit" onClick={() => console.log( 'Edit it!  This does not work yet' )}><EditIcon /></IconButton> }
+            { !this.props.commError && <IconButton edge="end" aria-label="delete" onClick={() =>this.deleteMessage(interaction.id)}><DeleteIcon /></IconButton> }
           </ListItem>
           <Divider variant="inset" component="li" key='dividerforthelist' />
           </span>
@@ -166,7 +162,7 @@ class Conversation extends React.Component {
     <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
         {output}
     </List>
-        <InteractionEditor 
+      { !this.props.commError && <InteractionEditor 
           scope={this.props.scope} 
           opportunities={this.props.opportunities} 
           companies={this.props.companies} 
@@ -174,8 +170,8 @@ class Conversation extends React.Component {
           convoAddHandler={this.props.convoAddHandler}
           >
 
-        </InteractionEditor>
-      </span>
+        </InteractionEditor> }
+      </span> 
     )
     } 
   }
