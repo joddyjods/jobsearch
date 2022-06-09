@@ -14,6 +14,8 @@ import VideoIcon from '@mui/icons-material/VideoCameraFront';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import ReactMarkdown from 'react-markdown'
+import ReactDom from 'react-dom'
 
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 
@@ -144,7 +146,9 @@ class Conversation extends React.Component {
                   >
                     {interaction.date}
                   </Typography>
-                   - {interaction.msg}
+                  <ReactMarkdown>
+                    {interaction.msg}
+                  </ReactMarkdown>
                 </React.Fragment>
               }
             />

@@ -9,8 +9,10 @@ The UI is a node application.  Here's an easy way to get going:
 3. Install typescript
    - npm install -g typescript
 4. Install a polling library - *- npm i react-polling --save*
-5. You will need to run the API service if the application is going to be functional: https://github.com/joddyjods/jobsearch-api
-6. Set up the material UI support - https://mui.com/material-ui/getting-started/installation/
+5. Install a markdown library - *npm install react-markdown*
+   - See: https://www.npmjs.com/package/react-markdown
+6. You will need to run the API service if the application is going to be functional: https://github.com/joddyjods/jobsearch-api
+7. Set up the material UI support - https://mui.com/material-ui/getting-started/installation/
 
 # Running the application
 - **npm** start - note that it will run on port 3000 by default

@@ -270,10 +270,10 @@ const StyledFab = styled(Fab)({
           <InputLabel id="demo-simple-select-label">What happened in the interaction</InputLabel>
           <TextareaAutosize
             aria-label="minimum height"
-            minRows={4}
-            maxRows={4}
+            minRows={8}
+            maxRows={8}
             value={defaults.notes}
-            placeholder="Description of what occurred in the meeting"
+            placeholder="Description of what occurred in the meeting (use Markdown)"
             onChange={(e) => setNotes(e.target.value)}
             style={{ width: 500 }}
             />

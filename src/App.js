@@ -111,24 +111,6 @@ class App extends React.Component {
 
   }
 
-  addCompany( company ) {
-    company.id = this.generateNextId();
-    this.state.companies.push( company );
-    this.setState( { companies : this.state.companies } );
-  }
-
-  addOpportunity( oppty ) {
-    oppty.id = this.generateNextId();
-    this.state.opportunities.push( oppty );
-    this.setState( { opportunities : this.state.opportunities } );
-  }
-
-  addPerson( person ) {
-    person.id = this.generateNextId();
-    this.state.people.push( person );
-    this.setState( { people : this.state.people } );
-  }
-
   convoAddHandler( newInteraction ) {
 
     const requestOptions = {
@@ -154,13 +136,6 @@ class App extends React.Component {
     newScope[scopeType] = newValue;
     this.setState( {scope: newScope} );
   }
-
-  generateNextId() {
-    let nextId = this.state.nextId;
-    this.setState( {nextId : ++nextId} );
-    return nextId;
-  }
-
 
  constructor(props) {
     super(props);
