@@ -21,6 +21,15 @@ import MuiAlert from '@mui/material/Alert';
 
 import ReactPolling from "react-polling";
 
+import LogInButton from "./components/login";
+import LogOutButton from "./components/logout";
+
+import {useEffect} from 'react';
+import {gapi} from 'gapi-script';
+
+const clientId = "152798730660-61397c89b64orq4a0d0i56p74p0ljks2.apps.googleusercontent.com";
+
+
 /*
 
 The App has flat lists of companies, opportunities, people and conversations.  
@@ -89,8 +98,47 @@ export default function Render(props) {
   
   const theme = useTheme();
   const open = React.useState(true);
-  
-  return ( <App {...props} theme={theme} open={open} /> )
+  const [loggedIn, setLoggedIn] = React.useState( false );
+
+  useEffect(() => {
+    function start() {
+      gapi.client.init({
+        clientId: clientId,
+        scope: ""
+      })
+    }
+
+    gapi.load( 'client:auth2', start );
+    setLoggedIn( gapi.auth != null && gapi.auth.getToken() != null );
+    console.log( loggedIn );
+  } );
+
+  const onLogin = () => {
+    console.log( "hi" );
+    console.log( gapi.auth );
+    setLoggedIn( gapi.auth != null );
+  };
+
+  const onLogout = () => {
+    console.log( "Logged Out" );
+    setLoggedIn( false );
+  }
+
+  const onFailedLogin = (res) => {
+    console.log( "FAILED TO LOGIN", res );
+  }
+
+  // const loggedIn = gapi.auth != null;
+  // gapi.auth.getToken().access_token
+
+  return ( 
+    <span>
+      {!loggedIn && 
+      <LogInButton onSuccess={onLogin} onFailure={onFailedLogin}/> }
+      {loggedIn && 
+      <App {...props} theme={theme} open={open} onLogout={onLogout} /> }
+    </span>
+  )
 }
 
 class App extends React.Component {
@@ -157,7 +205,6 @@ class App extends React.Component {
       }
     };
   }
- 
 
   render() {
 
@@ -186,7 +233,6 @@ class App extends React.Component {
 
     return (
       <Box sx={{ display: 'flex' }}>
-
         <ReactPolling
           url={serverUrl + "all"}
           interval= {2000} // in milliseconds(ms)
@@ -224,6 +270,7 @@ class App extends React.Component {
             <Typography variant="h6" noWrap sx={{ flexGrow: 1 }} component="div">
               Opportunities
             </Typography>
+            <LogOutButton onLogoutSuccess={this.props.onLogout}/>
             <IconButton
               color="inherit"
               aria-label="open drawer"

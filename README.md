@@ -13,6 +13,9 @@ The UI is a node application.  Here's an easy way to get going:
    - See: https://www.npmjs.com/package/react-markdown
 6. You will need to run the API service if the application is going to be functional: https://github.com/joddyjods/jobsearch-api
 7. Set up the material UI support - https://mui.com/material-ui/getting-started/installation/
+8. Set up google login support - - npm install gapi-script react-google-login --legacy-peer-deps
+   - Following this example: https://www.youtube.com/watch?v=HtJKUQXmtok
+
 
 # Running the application
 - **npm** start - note that it will run on port 3000 by default
