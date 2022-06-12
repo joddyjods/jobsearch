@@ -122,11 +122,16 @@ class Conversation extends React.Component {
       
       let interactions = this.scopeInteractions( this.props.interactions );
 
+      interactions.sort((a,b) => { 
+        return (a.date > b.date) ? -1 : ((a.date < b.date) ? 1 : 0);
+      });
+
       let output = interactions.map(interaction => {
         
         interaction.key = interaction.id;
         interaction.textkey = interaction.id;
         const spankey = "spanner" + interaction.id;
+        const dateToShow = new Date( interaction.date );
   
         return ( 
           <span key={spankey}>
@@ -144,7 +149,7 @@ class Conversation extends React.Component {
                     variant="body2"
                     color="text.primary"
                   >
-                    {interaction.date}
+                    {dateToShow.toLocaleString( 'en-US' )}
                   </Typography>
                   <ReactMarkdown>
                     {interaction.msg}

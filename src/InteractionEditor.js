@@ -99,13 +99,18 @@ export default function InteractionEditor( props ) {
     const interactionPeeps = getPeopleIdsAndNames( to, props );
 
     // TODO - if we have an existing interaction ID, use it
+    let saveTheDate = Date.now();
+    let newDate = Date.parse( thedate );
+    if ( !isNaN( newDate ) ){
+      saveTheDate = newDate;
+    }
 
     // Do the update with the information gathered
     const newInteraction = {
         source : thesource,
         from : interactionPeeps.from,
         fromYou : fromYou,
-        date : thedate,
+        date : saveTheDate,
         msg : notes,
         companyId : companyAndOppty.company,
         personId : interactionPeeps.to, 
@@ -198,6 +203,19 @@ const StyledFab = styled(Fab)({
     margin: '0 auto',
   });
 
+  const fillOutDateSegment = ( segment ) => {
+    const newSegment = '0' + segment;
+    return newSegment.substring( newSegment.length - 2, newSegment.length );
+  };
+
+  const theNow = new Date(Date.now());
+  const nowString = [
+    theNow.getFullYear(),'-',
+    fillOutDateSegment( theNow.getMonth()+1 ),'-',
+    fillOutDateSegment( theNow.getDate() ),'T',
+    fillOutDateSegment( theNow.getHours() ),':',
+    fillOutDateSegment( theNow.getMinutes() )].join('');
+
   return (
     <div>
         <StyledFab color="secondary" aria-label="add"  onClick={handleClickOpen}>
@@ -257,16 +275,17 @@ const StyledFab = styled(Fab)({
           
           
           <TextField
-            autoFocus
-            margin="dense"
-            id="date"
-            label="date"
-            type="date"
-            fullWidth
-            variant="standard"
+            id="datetime-local"
+            label="Date and Time"
+            type="datetime-local"
+            defaultValue={nowString}
             onChange={(e) => setDate(e.target.value)}
-            required
+            sx={{ width: 250 }}
+            InputLabelProps={{
+              shrink: true,
+            }}
           />
+
           <InputLabel id="demo-simple-select-label">What happened in the interaction</InputLabel>
           <TextareaAutosize
             aria-label="minimum height"

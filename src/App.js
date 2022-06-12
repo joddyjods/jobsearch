@@ -27,6 +27,7 @@ import LogOutButton from "./components/logout";
 import {useEffect} from 'react';
 import {gapi} from 'gapi-script';
 
+
 const clientId = "152798730660-61397c89b64orq4a0d0i56p74p0ljks2.apps.googleusercontent.com";
 
 
@@ -102,34 +103,28 @@ export default function Render(props) {
 
   useEffect(() => {
     function start() {
-      gapi.client.init({
+      gapi.auth2.init({
         clientId: clientId,
-        scope: ""
+        scope: "https://www.googleapis.com/auth/cloud-platform"
       })
     }
 
     gapi.load( 'client:auth2', start );
     setLoggedIn( gapi.auth != null && gapi.auth.getToken() != null );
-    console.log( loggedIn );
   } );
 
   const onLogin = () => {
-    console.log( "hi" );
-    console.log( gapi.auth );
-    setLoggedIn( gapi.auth != null );
+    console.log( gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile() );
+    setLoggedIn( gapi.auth != null && gapi.auth.getToken() != null );
   };
 
   const onLogout = () => {
-    console.log( "Logged Out" );
     setLoggedIn( false );
   }
 
   const onFailedLogin = (res) => {
     console.log( "FAILED TO LOGIN", res );
   }
-
-  // const loggedIn = gapi.auth != null;
-  // gapi.auth.getToken().access_token
 
   return ( 
     <span>
@@ -268,7 +263,7 @@ class App extends React.Component {
         <AppBar position="fixed" open={open}>
           <Toolbar>
             <Typography variant="h6" noWrap sx={{ flexGrow: 1 }} component="div">
-              Opportunities
+              {gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getGivenName()}'s Opportunities
             </Typography>
             <LogOutButton onLogoutSuccess={this.props.onLogout}/>
             <IconButton
