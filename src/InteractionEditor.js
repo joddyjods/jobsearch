@@ -21,7 +21,6 @@ import Checkbox from '@mui/material/Checkbox';
 
 // TODO - include an "update" mechanism
 // TODO - create validation and required fields (probably validate server-side tho)
-// TODO - figure out how to put in date values
 // TODO - Add some fields that cause status updates on the opportunities (closed, opened, etc)
 // TODO - Add some fields to rank your performance in the experience
 

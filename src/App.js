@@ -100,22 +100,24 @@ export default function Render(props) {
   const theme = useTheme();
   const open = React.useState(true);
   const [loggedIn, setLoggedIn] = React.useState( false );
+  const [userToken, setUserToken] = React.useState( null );
 
   useEffect(() => {
     function start() {
       gapi.auth2.init({
         clientId: clientId,
-        scope: "https://www.googleapis.com/auth/cloud-platform"
+        scope: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.file"
       })
     }
 
     gapi.load( 'client:auth2', start );
-    setLoggedIn( gapi.auth != null && gapi.auth.getToken() != null );
   } );
 
   const onLogin = () => {
-    console.log( gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile() );
+    //console.log( gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile() );
+    //console.log( gapi.auth2.getAuthInstance().currentUser.get().tokenObj );
     setLoggedIn( gapi.auth != null && gapi.auth.getToken() != null );
+    setUserToken( gapi.auth2.getAuthInstance().currentUser.get().tokenObj );
   };
 
   const onLogout = () => {
@@ -124,6 +126,7 @@ export default function Render(props) {
 
   const onFailedLogin = (res) => {
     console.log( "FAILED TO LOGIN", res );
+    setLoggedIn( false );
   }
 
   return ( 
@@ -131,7 +134,7 @@ export default function Render(props) {
       {!loggedIn && 
       <LogInButton onSuccess={onLogin} onFailure={onFailedLogin}/> }
       {loggedIn && 
-      <App {...props} theme={theme} open={open} onLogout={onLogout} /> }
+      <App {...props} theme={theme} open={open} onLogout={onLogout} userToken={userToken} /> }
     </span>
   )
 }
@@ -141,7 +144,7 @@ class App extends React.Component {
   convoDeleteHandler(id) {
     const requestOptions = {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : serverUrl },
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : serverUrl, 'Authorization': JSON.stringify(this.props.userToken) },
     };
 
     var url = new URL( serverUrl + "interactions" );
@@ -158,7 +161,7 @@ class App extends React.Component {
 
     const requestOptions = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : serverUrl },
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin' : serverUrl, 'Authorization': JSON.stringify(this.props.userToken) },
         body: JSON.stringify( newInteraction )
     };
 
@@ -192,6 +195,7 @@ class App extends React.Component {
       convoAddHandler : this.convoAddHandler.bind( this ),
       scopeChangeHandler : this.scopeChange.bind( this ),
       nextId : 9999999,
+      userToken : null,
 
       scope : {
         company : null,
@@ -232,23 +236,40 @@ class App extends React.Component {
           url={serverUrl + "all"}
           interval= {2000} // in milliseconds(ms)
           retryCount={10} // this is optional
-          headers={ { 'Access-Control-Allow-Origin' : serverUrl } }
+          headers={ 
+            { 
+              'Access-Control-Allow-Origin' : serverUrl,
+              'Authorization': JSON.stringify(this.props.userToken)
+            } 
+          }
           onSuccess={resp => {
-              this.setState( {opportunities : resp.opportunities} );
-              this.setState( {companies : resp.companies} );
-              this.setState( {interactions : resp.interactions} );
-              this.setState( {people : resp.people } );
-              this.setState( { synced : true });
-              this.setState( { commError : false } );
-              return true;
+            if ( resp.opportunities != null && resp.companies != null && resp.interactions != null && resp.people != null ) {
+                this.setState( {opportunities : resp.opportunities} );
+                this.setState( {companies : resp.companies} );
+                this.setState( {interactions : resp.interactions} );
+                this.setState( {people : resp.people } );
+                this.setState( { synced : true });
+                this.setState( { commError : false } );
+                return true;
+              }
+              else {
+                console.log( resp );
+                this.setState( { synced : true });
+                this.setState( { commError : true } );
+                return true;
+              }
             }
           }
           onFailure={resp => {
-            console.log({ resp });
             this.setState( { synced : false } );
             this.setState( { commError : true } );
             return true;
           }} // this is optional
+          catch={resp => {
+            this.setState( { synced : false } );
+            this.setState( { commError : true } );
+            return true;
+          }}
           method={'GET'}
           render={({ startPolling, stopPolling, isPolling }) => {
             return <Snackbar open={!isPolling} onClose={handleAlertClose}>
