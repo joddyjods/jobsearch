@@ -27,9 +27,7 @@ import LogOutButton from "./components/logout";
 import {useEffect} from 'react';
 import {gapi} from 'gapi-script';
 
-
-const clientId = "152798730660-61397c89b64orq4a0d0i56p74p0ljks2.apps.googleusercontent.com";
-
+const clientId = process.env['REACT_APP_GOOGLE_OAUTH2_CLIENT_ID'];
 
 /*
 
@@ -101,23 +99,36 @@ export default function Render(props) {
   const open = React.useState(true);
   const [loggedIn, setLoggedIn] = React.useState( false );
   const [userToken, setUserToken] = React.useState( null );
+  const [auth, setAuth] = React.useState( null );
 
+  // Scope if you want to do show JSON files in the person's directories: https://www.googleapis.com/auth/drive.file
   useEffect(() => {
     function start() {
       gapi.auth2.init({
         clientId: clientId,
-        scope: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.file"
+        scope: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/drive.appdata"
       })
     }
 
     gapi.load( 'client:auth2', start );
   } );
 
+  // updates auth state to current auth status
+  // triggered when authentication status changes
+  const onAuthChange = () => {
+    const auth = this.state.auth;
+    this.setLoggedIn( auth.isSignedIn.get() );
+  }
+
   const onLogin = () => {
     //console.log( gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile() );
     //console.log( gapi.auth2.getAuthInstance().currentUser.get().tokenObj );
     setLoggedIn( gapi.auth != null && gapi.auth.getToken() != null );
     setUserToken( gapi.auth2.getAuthInstance().currentUser.get().tokenObj );
+    const auth = window.gapi.auth2.getAuthInstance();
+    auth.isSignedIn.listen(onAuthChange);
+
+    setAuth( auth );
   };
 
   const onLogout = () => {
@@ -250,6 +261,7 @@ class App extends React.Component {
                 this.setState( {people : resp.people } );
                 this.setState( { synced : true });
                 this.setState( { commError : false } );
+                //console.log( this.state );
                 return true;
               }
               else {

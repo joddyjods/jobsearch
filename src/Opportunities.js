@@ -74,6 +74,7 @@ class Opportunities extends React.Component {
         oppty.lineIndex = i;
         oppty.key = 'Opptyline' + i++;
         oppty.textkey = 'Opptyline' + i++;
+        const companyName = oppty.company != null && oppty.company.name != null ? oppty.company.name : "No Company Assigned";
 
         return ( 
             <ListItemButton
@@ -93,7 +94,7 @@ class Opportunities extends React.Component {
                         variant="body2"
                         color="text.primary"
                       >
-                        {oppty.company.name}
+                        {companyName}
                       </Typography>
                     </React.Fragment>
                   }/>

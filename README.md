@@ -20,6 +20,7 @@ The UI is a node application.  Here's an easy way to get going:
 10. Set up google login support - - npm install gapi-script react-google-login --legacy-peer-deps
    - Following this example: https://www.youtube.com/watch?v=HtJKUQXmtok
 11. npm install @date-io/dayjs --legacy-peer-deps
+12. npm install dotenv
 
 
 # Running the application
@@ -27,6 +28,10 @@ The UI is a node application.  Here's an easy way to get going:
 - **npm** test - runs the test runner
 - **npm** start - starts the development server
 
-# Things that are next to do
-- [ ] Make the UI do something with the API service
-- [ ] Take a look at incorporating material UI - https://mui.com 
+# TODO
+- Revoke and replace the client ID from google cloud
+- Fix the highlighting on the selected opportunity (it goes away)
+- Make the + button float so that it doesn't move up with the opportunities
+- Make the login page more descriptive
+- Allow editing of interactions
+- Add status setters to the interactions to update the opportunity statuses
